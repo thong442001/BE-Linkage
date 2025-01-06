@@ -31,8 +31,7 @@ const user = new Schema({
         type: Number, // kiểu dữ liệu
         // 0: user bi khoa
         // 1: admin 
-        // 2: manage
-        // 3: user
+        // 2: user
     },
     createdAt: {
         type: Date, // kiểu dữ liệu

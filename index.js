@@ -20,6 +20,12 @@ var friendNotificationRoute = require('./routes/friendNotificationRoute');
 
 var app = express();
 
+// socket.io
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+
 // CORS
 app.use(cors())
 //app.use(logger('dev'));
@@ -71,6 +77,7 @@ app.use('/friendNotification', friendNotificationRoute);
 //     res.render('error');
 // });
 
-app.listen(3000, () => console.log("Server ready on port 3000."));
+// app.listen(3000, () => console.log("Server ready on port 3000."));
+server.listen(3000, () => console.log("Server ready on port 3000."));
 
 module.exports = app;

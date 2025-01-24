@@ -21,13 +21,13 @@ var friendNotificationRoute = require('./routes/friendNotificationRoute');
 var app = express();
 
 // socket.io
-const http = require('http');
+const http = require('https');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 //const io = new Server(server);
 const io = new Server(server, {
     cors: {
-        origin: '*', // Hoặc chỉ định nguồn cụ thể
+        origin: 'https://be-linkage.vercel.app/', // Hoặc chỉ định nguồn cụ thể
         methods: ['GET', 'POST'],
     },
 });
@@ -35,7 +35,7 @@ const io = new Server(server, {
 // CORS
 //app.use(cors())
 app.use(cors({
-    origin: '*', // Hoặc chỉ định nguồn cụ thể: ['http://localhost:19006', 'https://your-client-url']
+    origin: 'https://be-linkage.vercel.app/', // Hoặc chỉ định nguồn cụ thể: ['http://localhost:19006', 'https://your-client-url']
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 }));

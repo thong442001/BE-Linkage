@@ -30,6 +30,7 @@ const io = new Server(server);
 app.use(cors())
 //app.use(logger('dev'));
 app.use(express.json());
+// Middleware để phân tích dữ liệu từ form
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -77,7 +78,34 @@ app.use('/friendNotification', friendNotificationRoute);
 //     res.render('error');
 // });
 
+// socket.io
 // app.listen(3000, () => console.log("Server ready on port 3000."));
-server.listen(3000, () => console.log("Server ready on port 3000."));
+app.get('/', (req, res) => {
+    res.send('Socket.io server is running!');
+});
+
+// Lắng nghe kết nối từ client
+io.on('connection', (socket) => {
+    console.log(`User connected: ${socket.id}`);
+
+    // Nhận tin nhắn từ client
+    socket.on('send_message', (data) => {
+        console.log('Message received: ', data);
+
+        // Phát lại tin nhắn cho tất cả các client
+        io.emit('receive_message', data);
+    });
+
+    // Ngắt kết nối
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: ${socket.id}`);
+    });
+});
+
+// Khởi động server
+const PORT = 3001;
+server.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 module.exports = app;

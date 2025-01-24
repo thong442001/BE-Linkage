@@ -27,7 +27,11 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 
 // CORS
-app.use(cors())
+//app.use(cors())
+app.use(cors({
+    origin: '*', // Cho phép tất cả nguồn gốc kết nối
+    methods: ['GET', 'POST'], // Các phương thức HTTP được phép
+}));
 //app.use(logger('dev'));
 app.use(express.json());
 // Middleware để phân tích dữ liệu từ form

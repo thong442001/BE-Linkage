@@ -24,13 +24,20 @@ var app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+//const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: '*', // Hoặc chỉ định nguồn cụ thể
+        methods: ['GET', 'POST'],
+    },
+});
 
 // CORS
 //app.use(cors())
 app.use(cors({
-    origin: '*', // Cho phép tất cả nguồn gốc kết nối
-    methods: ['GET', 'POST'], // Các phương thức HTTP được phép
+    origin: '*', // Hoặc chỉ định nguồn cụ thể: ['http://localhost:19006', 'https://your-client-url']
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
 }));
 //app.use(logger('dev'));
 app.use(express.json());

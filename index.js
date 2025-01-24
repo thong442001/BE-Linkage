@@ -21,21 +21,23 @@ var friendNotificationRoute = require('./routes/friendNotificationRoute');
 var app = express();
 
 // socket.io
-const http = require('https');
+const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 //const io = new Server(server);
 const io = new Server(server, {
     cors: {
-        origin: 'https://be-linkage.vercel.app/', // Hoặc chỉ định nguồn cụ thể
+        origin: '*', // Cho phép bất kỳ nguồn nào hoặc chỉ định URL của ứng dụng React Native của bạn
         methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type'],
     },
+    transports: ['polling'], // Đảm bảo sử dụng polling như phương án thay thế
 });
 
 // CORS
 //app.use(cors())
 app.use(cors({
-    origin: 'https://be-linkage.vercel.app/', // Hoặc chỉ định nguồn cụ thể: ['http://localhost:19006', 'https://your-client-url']
+    origin: '*', // Hoặc chỉ định nguồn cụ thể: ['http://localhost:19006', 'https://your-client-url']
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 }));

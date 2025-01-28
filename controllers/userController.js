@@ -8,6 +8,7 @@ const postController = require("../controllers/postController")
 
 module.exports = {
     getAllUsers,//user
+    getUser,
     getRoleUser,
     getUsersDisplayName,
     addUser,
@@ -37,7 +38,15 @@ async function getAllUsers() {
         throw error;
     }
 }
-
+async function getUser(userId) {
+    try {
+        const result = await users.findById(userId);
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
 // search 
 async function getRoleUser() {
     try {

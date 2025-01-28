@@ -252,6 +252,17 @@ router.get('/getRoleUser', checkToken, async function (req, res, next) {
   }
 });
 
+//http://localhost:3000/user/getUser
+router.get('/getUser', checkToken, async function (req, res, next) {
+  try {
+    const { userId } = req.query;
+    const result = await userController.getUser(userId);
+    res.status(200).json({ "status": true, "user": result });
+  } catch (e) {
+    res.status(400).json({ "status": false, "message": "lỗi" });
+  }
+});
+
 
 //get Users DisplayName (search)
 //http://localhost:3000/user/getUsersDisplayName

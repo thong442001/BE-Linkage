@@ -2,13 +2,21 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 const group = new Schema({
-    id: { type: ObjectId }, // khóa chính
     name: {
         type: String, // kiểu dữ liệu
+        default: null,
     },
     avatar: {
         type: String, // kiểu dữ liệu
-        default: "https://i.pinimg.com/564x/14/30/f2/1430f2a57ce798b01b075c3e88df5dc9.jpg",// avatar mặc định 
+        default: null,
+    },
+    members: [{
+        type: ObjectId,
+        ref: 'user'
+    }],
+    isPrivate: { // Đánh dấu là nhóm riêng tư 2 người
+        type: Boolean,
+        default: true
     },
     updatedAt: {
         type: Date, // kiểu dữ liệu

@@ -1,5 +1,6 @@
 //var createError = require('http-errors');
 const express = require("express");
+const http = require('http');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 //var logger = require('morgan');
@@ -10,29 +11,25 @@ var cors = require('cors')
 const mongoose = require("mongoose");
 require("./models/user");
 require("./models/post");
+require("./models/group");
+require("./models/message");
 require("./models/friendNotification");
 
 var indexRouter = require('./routes/index');
 //mogo
 var userRoute = require('./routes/userRoute');
 var postRoute = require('./routes/postRoute');
+var groupRoute = require('./routes/groupRoute');
+var messageRoute = require('./routes/messageRoute');
 var friendNotificationRoute = require('./routes/friendNotificationRoute');
 
 var app = express();
 
 // socket.io
-const http = require('http');
+const setupSocket = require("./socket");
 const server = http.createServer(app);
-const { Server } = require("socket.io");
-//const io = new Server(server);
-const io = new Server(server, {
-    cors: {
-        origin: '*', // Cho phép bất kỳ nguồn nào hoặc chỉ định URL của ứng dụng React Native của bạn
-        methods: ['GET', 'POST'],
-        allowedHeaders: ['Content-Type'],
-    },
-    transports: ['polling'], // Đảm bảo sử dụng polling như phương án thay thế
-});
+const io = setupSocket(server);
+
 
 // CORS
 //app.use(cors())
@@ -74,6 +71,8 @@ app.use('/', indexRouter);
 //mogo
 app.use('/user', userRoute);
 app.use('/post', postRoute);
+app.use('/group', groupRoute);
+app.use('/message', messageRoute);
 app.use('/friendNotification', friendNotificationRoute);
 
 // // catch 404 and forward to error handler
@@ -92,28 +91,10 @@ app.use('/friendNotification', friendNotificationRoute);
 // });
 
 // socket.io
-// app.listen(3000, () => console.log("Server ready on port 3000."));
-app.get('/', (req, res) => {
-    res.send('Socket.io server is running!');
-});
-
-// Lắng nghe kết nối từ client
-io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`);
-
-    // Nhận tin nhắn từ client
-    socket.on('send_message', (data) => {
-        console.log('Message received: ', data);
-
-        // Phát lại tin nhắn cho tất cả các client
-        io.emit('receive_message', data);
-    });
-
-    // Ngắt kết nối
-    socket.on('disconnect', () => {
-        console.log(`User disconnected: ${socket.id}`);
-    });
-});
+// // app.listen(3000, () => console.log("Server ready on port 3000."));
+// app.get('/', (req, res) => {
+//     res.send('Socket.io server is running!');
+// });
 
 // Khởi động server
 const PORT = 3001;

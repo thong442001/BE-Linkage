@@ -26,7 +26,8 @@ async function getMessagesGroup(ID_group) {
     try {
         const messages = await message.find({ ID_group: ID_group })
             .populate('sender', 'displayName avatar')
-            .sort({ createdAt: 1 });;
+            .populate("ID_message_reply", "content") // Lấy đầy đủ thông tin của tin nhắn trả lời
+            .sort({ createdAt: 1 });
         return messages;
     } catch (error) {
         console.log(error);

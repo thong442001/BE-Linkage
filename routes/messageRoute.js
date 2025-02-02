@@ -37,6 +37,20 @@ router.get('/getMessagesGroup', checkToken, async function (req, res, next) {
   }
 });
 
-
+//edit  
+//http://localhost:3000/message/set_destroyTrue
+router.post('/set_destroyTrue', checkToken, async function (req, res, next) {
+  try {
+    const { ID_message } = req.body;
+    const result = await messageController.set_destroyTrue(ID_message);
+    if (result) {
+      res.status(200).json({ "status": true, "message": "Thu hồi tin nhắn thành công" });
+    } else {
+      res.status(401).json({ "status": false, "message": "Thu hồi tin nhắn thất bại" });
+    }
+  } catch (e) {
+    return res.status(400).json({ "status": false, "message": "lỗi" });
+  }
+});
 
 module.exports = router;

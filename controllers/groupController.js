@@ -1,18 +1,19 @@
 const group = require("../models/group");
+const message = require("../models/message");
 
 module.exports = {
     findGroupPrivate,
     addGroupPrivate,
     getGroupID,
-    findID_userGroupPrivate,
     getAllGroupOfUser,
 }
-
+//
 async function addGroupPrivate(user1, user2) {
     try {
         const members = [user1, user2]
         const newItem = {
             members,
+            createdAt: Date.now(),
         };
         const newGroupPrivate = await group.create(newItem);
         //console.log(newGroup);
@@ -22,6 +23,7 @@ async function addGroupPrivate(user1, user2) {
         return false;
     }
 }
+//
 async function getGroupID(ID_group) {
     try {
         const result = await group.findById(ID_group).populate({
@@ -35,22 +37,8 @@ async function getGroupID(ID_group) {
     }
 }
 
-async function findID_userGroupPrivate(group, ID_me) {
-    try {
-        if (group.isPrivate = true) {
-            group?.members.map((user) => {
-                if (user != ID_me) {
-                    return user
-                }
-            })
-        }
-        return false;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-}
 
+//
 async function findGroupPrivate(user1, user2) {
     try {
         // Tìm nhóm riêng chứa cả 2 user
@@ -70,15 +58,43 @@ async function findGroupPrivate(user1, user2) {
     }
 }
 
-
+//
 async function getAllGroupOfUser(ID_user) {
     try {
+        // Tìm các nhóm mà user tham gia
         const groups = await group.find({ members: ID_user })
             .populate('members', 'displayName avatar')
+            .lean() // Lấy kết quả dưới dạng object JavaScript để thêm thuộc tính cho group
             .exec();
-        return groups;
+        // Lấy tin nhắn mới nhất của từng nhóm bằng Promise.all()
+        const updatedGroups = await Promise.all(groups.map(async (group) => {
+            const messageNew = await message.find({ ID_group: group._id })
+                .populate('sender', 'displayName avatar')
+                .sort({ createdAt: -1 })
+                .limit(1);
+
+            if (messageNew.length > 0) {
+                group.messageLatest = {
+                    ID_message: messageNew[0]._id,
+                    sender: {
+                        ID_user: messageNew[0].sender._id,
+                        displayName: messageNew[0].sender.displayName,
+                        avatar: messageNew[0].sender.avatar,
+                    },
+                    content: messageNew[0].content,
+                    createdAt: messageNew[0].createdAt,
+                    _destroy: messageNew[0]._destroy,
+                };
+            } else {
+                group.messageLatest = null;
+            }
+            //console.log(group.messageLatest);
+            return group; // ✅ Quan trọng: Return group để cập nhật giá trị
+        }));
+        return updatedGroups.filter(group => group && group.messageLatest != null);
     } catch (error) {
-        console.log(error);
+        console.error("Lỗi khi lấy nhóm:", error);
         throw error;
     }
 }
+

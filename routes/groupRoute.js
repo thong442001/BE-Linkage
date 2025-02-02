@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 
 const groupController = require("../controllers/groupController")
-const userController = require("../controllers/userController")
 
 //checkToken
 const checkToken = require("./checkToken");

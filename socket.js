@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const message = require("./models/message");
 const user = require("./models/user");
+const { param } = require(".");
 
 function setupSocket(server) {
     const io = new Server(server, {
@@ -16,20 +17,7 @@ function setupSocket(server) {
 
     // Lắng nghe kết nối từ client
     io.on('connection', (socket) => {
-        // console.log(`User connected: ${socket.id}`);
 
-        // socket.on("joinGroup", (groupId) => {
-        //     socket.join(groupId);
-        //     console.log(`User joined group: ${groupId}`);
-        // });
-
-        // // Nhận tin nhắn từ client
-        // socket.on('send_message', (data) => {
-        //     console.log('Message received: ', data);
-
-        //     // Phát lại tin nhắn cho tất cả các client
-        //     io.emit('receive_message', data);
-        // });
         console.log(`✅ User connected: ${socket.id}`);
 
         socket.on("joinGroup", (ID_group) => {
@@ -55,7 +43,9 @@ function setupSocket(server) {
                 sender,
                 content,
                 type,
-                ID_message_reply
+                ID_message_reply,
+                createdAt: Date.now(),
+                _destroy: false,
             });
             await newMessage.save();
 
@@ -70,8 +60,27 @@ function setupSocket(server) {
                 displayName: checkUser.displayName,  // Thêm tên hiển thị
                 avatar: checkUser.avatar,            // Thêm avatar
                 createdAt: newMessage.createdAt,// tạo newMessage trc mới có createdAt
+                _destroy: newMessage._destroy,
             };
             io.to(newMessageSocket.ID_group).emit('receive_message', newMessageSocket);
+        });
+
+        // Xử lý thu hồi tin nhắn
+        socket.on('revoke_message', async (data) => {
+            const { ID_message, ID_group } = data;
+            const messageEdit = await message.findById(ID_message)
+            if (messageEdit) {
+                // thu hồi
+                messageEdit._destroy = true;
+                await messageEdit.save();
+                console.log("✅ Thu hồi tin nhắn thành công");
+            } else {
+                console.log("❌ Tin nhắn không tồn tại!");
+            }
+            const paramNew = {
+                ID_message
+            }
+            io.to(ID_group).emit('message_revoked', paramNew);
         });
 
         // Ngắt kết nối

@@ -14,7 +14,7 @@ const message = new Schema({
         type: String, // kiểu dữ liệu
         required: true,
     },
-    type: {
+    type: { // kiểu tin nhắn
         type: String, // kiểu dữ liệu
         enum: ['text', 'image', 'video'],
         required: "text",
@@ -28,7 +28,7 @@ const message = new Schema({
         type: Date, // kiểu dữ liệu
         default: Date.now()
     },
-    _destroy: {
+    _destroy: {// thu hồi
         type: Boolean, // kiểu dữ liệu
         default: false
     },

@@ -1,7 +1,7 @@
 const { Server } = require("socket.io");
 const message = require("./models/message");
 const user = require("./models/user");
-const { param } = require(".");
+const message_reaction = require("./models/message_reaction");
 
 function setupSocket(server) {
     const io = new Server(server, {
@@ -82,6 +82,46 @@ function setupSocket(server) {
             }
             io.to(ID_group).emit('message_revoked', paramNew);
         });
+
+
+        // Xử lý message_reaction
+        socket.on('send_message_reaction', async (data) => {
+            const { ID_group, ID_message, ID_user, ID_reaction } = data;
+            // tìm coi message_reaction có chưa 
+            const checkMessage_Reaction = await message_reaction.findOne({
+                ID_message: ID_message,
+                ID_user: ID_user,
+                ID_reaction: ID_reaction
+            })
+            if (checkMessage_Reaction != null) {
+                // nếu có rồi thì tăng quantity
+                checkMessage_Reaction.quantity = checkMessage_Reaction.quantity + 1;
+                await checkMessage_Reaction.save();
+                // Populate lại dữ liệu trước khi gửi
+                const populatedReaction = await message_reaction.findById(checkMessage_Reaction._id)
+                    .populate('ID_user', 'displayName avatar')
+                    .populate('ID_reaction', 'name icon')
+                    .lean();
+                io.to(ID_group).emit('receive_message_reation', populatedReaction);
+            } else {
+                // chưa thì tạo
+                const newItem = {
+                    ID_message,
+                    ID_user,
+                    ID_reaction,
+                    createdAt: Date.now(),
+                };
+                const newMessage_Reaction = await message_reaction.create(newItem);
+                // Populate lại dữ liệu trước khi gửi
+                const populatedMessage_Reaction = await message_reaction.findById(newMessage_Reaction._id)
+                    .populate('ID_user', 'displayName avatar')
+                    .populate('ID_reaction', 'name icon')
+                    .lean();
+
+                io.to(ID_group).emit('receive_message_reation', populatedMessage_Reaction);
+            }
+        });
+
 
         // Ngắt kết nối
         socket.on('disconnect', () => {

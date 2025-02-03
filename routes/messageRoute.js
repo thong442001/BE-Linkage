@@ -28,6 +28,7 @@ router.get('/getMessagesGroup', checkToken, async function (req, res, next) {
     const { ID_group } = req.query;
     const messages = await messageController.getMessagesGroup(ID_group);
     if (messages != null) {
+      //console.log(messages);
       res.status(200).json({ "status": true, "messages": messages });
     } else {
       res.status(201).json({ "status": true, "messages": null });

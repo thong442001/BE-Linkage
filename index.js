@@ -13,6 +13,8 @@ require("./models/user");
 require("./models/post");
 require("./models/group");
 require("./models/message");
+require("./models/reaction");
+require("./models/message_reaction");
 require("./models/friendNotification");
 
 var indexRouter = require('./routes/index');
@@ -21,6 +23,8 @@ var userRoute = require('./routes/userRoute');
 var postRoute = require('./routes/postRoute');
 var groupRoute = require('./routes/groupRoute');
 var messageRoute = require('./routes/messageRoute');
+var reactionRoute = require('./routes/reactionRoute');
+var message_reactionRoute = require('./routes/message_reactionRoute');
 var friendNotificationRoute = require('./routes/friendNotificationRoute');
 
 var app = express();
@@ -73,6 +77,8 @@ app.use('/user', userRoute);
 app.use('/post', postRoute);
 app.use('/group', groupRoute);
 app.use('/message', messageRoute);
+app.use('/reaction', reactionRoute);
+app.use('/message_reactionRoute', message_reactionRoute);
 app.use('/friendNotification', friendNotificationRoute);
 
 // // catch 404 and forward to error handler
